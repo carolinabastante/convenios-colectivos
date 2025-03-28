@@ -32,8 +32,12 @@
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const data = JSON.parse(e.target.result);
-                    renderTables(data);
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        renderTables(data);
+                    } catch (error) {
+                        alert('Error al cargar el archivo. Asegúrate de que sea un archivo JSON válido.');
+                    }
                 };
                 reader.readAsText(file);
             }
@@ -45,7 +49,7 @@
 
             for (const sheetName in data) {
                 const tableData = data[sheetName];
-                if (tableData.length > 0) {
+                if (Array.isArray(tableData) && tableData.length > 0) {
                     const headers = Object.keys(tableData[0]);
 
                     const table = document.createElement('table');
@@ -69,7 +73,7 @@
                         const tr = document.createElement('tr');
                         headers.forEach(header => {
                             const td = document.createElement('td');
-                            td.textContent = row[header];
+                            td.textContent = row[header] || 'N/A';
                             tr.appendChild(td);
                         });
                         tbody.appendChild(tr);
